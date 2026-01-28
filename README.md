@@ -1,318 +1,253 @@
 # Cursor Rules Central Repository
 
-**Complete, production-ready Cursor AI rules for consistent code generation across all projects.**
+**Centralized AI rules for consistent code generation across all projects.**
 
-> ⚠️ **IMPORTANT**: This repository uses the correct `.mdc` format in `.cursor/rules/` directory as per Cursor's official documentation (2024+).
-
----
-
-## 📁 Repository Structure
-
-```
-cursor-rules-central/
-├── .cursor/
-│   └── rules/                     ← Cursor rules (proper format)
-│       ├── global-standards.mdc   ← Always active
-│       ├── typescript.mdc         ← For .ts/.tsx files
-│       ├── react.mdc              ← For React components
-│       └── python.mdc             ← For .py files
-│
-├── scripts/
-│   ├── setup-project.ps1          ← Per-project setup (Windows)
-│   └── verify-safety.ps1          ← Safety verification (Windows)
-│
-├── docs/
-│   └── GETTING-STARTED.md         ← Quick start guide
-│
-├── .gitignore                     ← Prevents committing sensitive files
-└── README.md                      ← You are here
-```
+[![Status](https://img.shields.io/badge/status-production%20ready-green)]()
+[![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
 
 ---
 
-## 🚀 Quick Start (5 Minutes)
+## What This Does
 
-### Step 1: Clone This Repository
+Provides a single source of truth for Cursor AI rules that automatically applies to all your projects. Write rules once, use everywhere, update easily.
 
-```bash
-# Clone to a permanent location
-git clone https://github.com/your-org/cursor-rules-central.git
-cd cursor-rules-central
+---
+
+## Quick Start
+
+### 1. Clone Repository (One Time)
+
+```powershell
+cd ~
+git clone https://github.com/kitebish/cursor-rules-central.git
 ```
 
-### Step 2: Open in Cursor
+### 2. Setup a Project (2 Minutes)
 
-```bash
-# Open this repository in Cursor
+```powershell
+cd C:\Projects\your-project
+& "C:\Users\YourName\cursor-rules-central\scripts\setup-project.ps1"
 cursor .
 ```
 
-**That's it!** Cursor will automatically detect and load the rules from `.cursor/rules/`.
+### 3. Test It
+
+Ask Cursor: _"Create a function to fetch user data"_
+
+**Result**: Code following all your rules automatically! ✨
 
 ---
 
-## 📖 How It Works
+## What's Included
 
-### Automatic Rule Loading
+### 📋 Rule Files
 
-Cursor automatically loads rules from `.cursor/rules/` when you open a project. Rules are applied based on:
+- **global-standards.mdc** - Company-wide standards (always active)
+- **typescript.mdc** - TypeScript types, interfaces, async/await
+- **react.mdc** - React hooks, components, performance
+- **python.mdc** - PEP 8, type hints, docstrings
 
-1. **`alwaysApply: true`** - Rule always active (e.g., global-standards.mdc)
-2. **`globs` patterns** - Rule applies to matching files (e.g., `**/*.ts` for TypeScript)
-3. **AI intelligence** - Cursor's AI decides relevance
+### 🛠️ Scripts
 
-### Example: TypeScript File
+- **setup-project.ps1** - Automated project setup (copies rules + safety)
+- **verify-safety.ps1** - Tests all safety mechanisms
 
-When you edit `src/utils/api.ts`:
+### 🛡️ Safety System
 
-```
-Cursor loads:
-1. global-standards.mdc    (alwaysApply: true)
-2. typescript.mdc          (globs: **/*.ts)
+5 layers of protection prevent accidental commits:
 
-Result: AI follows both global AND TypeScript rules
-```
-
-### Example: React Component
-
-When you edit `src/components/UserCard.tsx`:
-
-```
-Cursor loads:
-1. global-standards.mdc    (alwaysApply: true)
-2. typescript.mdc          (globs: **/*.tsx)
-3. react.mdc               (globs: **/*.tsx, **/components/**)
-
-Result: AI follows global + TypeScript + React rules
-```
+1. Project `.gitignore`
+2. Pre-commit hooks
+3. Verification script
+4. Central repo `.gitignore`
+5. Team training
 
 ---
 
-## 🛡️ Safety System
+## How It Works
 
-### The Problem
-
-**CRITICAL**: Cursor rules often contain company-specific information and should NEVER be committed to customer repositories.
-
-### The Solution: Multi-Layer Protection
-
-This repository includes safety mechanisms to prevent accidental commits:
-
-#### Layer 1: .gitignore
-
-```gitignore
-# In each project's .gitignore
-.cursor/
-*.mdc
+```
+Central Repo (One Place)          Your Projects (Many)
+┌─────────────────────┐          ┌──────────────────┐
+│ cursor-rules-central│          │ customer-project │
+│  └─ .cursor/rules/  │  ─────>  │  └─ .cursor/     │
+│      ├─ global.mdc  │  Copy    │      └─ rules/   │
+│      ├─ typescript  │          │         (copied) │
+│      └─ react.mdc   │          └──────────────────┘
+└─────────────────────┘
 ```
 
-#### Layer 2: Pre-commit Hook
-
-Automatically installed by `setup-project.ps1`, blocks commits containing cursor files.
-
-#### Layer 3: Verification Script
-
-Run `verify-safety.ps1` to test all safety layers.
+**The Magic**: Run `setup-project.ps1` → Rules copied → Cursor loads them → AI follows your standards
 
 ---
 
-## 🔧 Setting Up Projects
+## Documentation
 
-### For New Projects
+- **[Complete Setup Guide](./docs/COMPLETE-SETUP-GUIDE.md)** - Full documentation
+- **[Getting Started](./docs/GETTING-STARTED.md)** - Quick start guide
+- **[GitHub Setup](./docs/GITHUB-SETUP.md)** - GitHub deployment
+
+---
+
+## Features
+
+✅ **Centralized** - One source of truth  
+✅ **Automated** - One command setup  
+✅ **Safe** - Multi-layer protection  
+✅ **Flexible** - Language & framework specific  
+✅ **Team-Ready** - Easy onboarding  
+✅ **Version Controlled** - Git-based updates
+
+---
+
+## Common Commands
 
 ```powershell
-# Navigate to your project
-cd C:\Projects\customer-project
+# Setup new project
+& "path\to\cursor-rules-central\scripts\setup-project.ps1"
 
-# Run setup script
-C:\path\to\cursor-rules-central\scripts\setup-project.ps1
-```
+# Verify safety
+& "path\to\cursor-rules-central\scripts\verify-safety.ps1"
 
-**What this does**:
-
-1. Adds `.cursor/` to `.gitignore`
-2. Installs pre-commit hook
-3. Verifies safety mechanisms
-
-### For Existing Projects
-
-Same process - the script is safe to run multiple times.
-
----
-
-## 📝 Available Rules
-
-### Global Standards (Always Active)
-
-- Naming conventions
-- Code organization
-- Security best practices
-- Git commit messages
-- Testing guidelines
-
-### TypeScript (_.ts, _.tsx)
-
-- Type system best practices
-- Modern TypeScript features
-- Null safety
-- Generics and utility types
-- JSDoc documentation
-
-### React (_.jsx, _.tsx, components/\*\*)
-
-- Functional components with hooks
-- Custom hooks patterns
-- Props and state management
-- Performance optimization
-- Component organization
-
-### Python (\*.py)
-
-- PEP 8 compliance
-- Type hints
-- Docstrings
-- Error handling
-- Async/await patterns
-
----
-
-## 🎯 Using the Rules
-
-### In Cursor Chat
-
-Ask Cursor to generate code:
-
-```
-You: "Create a UserCard component that displays user name and email"
-
-Cursor: [Generates React component following all applicable rules]
-```
-
-### In Code Editor
-
-Start typing and Cursor will suggest code that follows the rules automatically.
-
-### Checking Active Rules
-
-In Cursor:
-
-1. Open Command Palette (Ctrl+Shift+P)
-2. Type: "Cursor: Show Active Rules"
-3. See which rules are currently loaded
-
----
-
-## 🔄 Updating Rules
-
-### Pull Latest Changes
-
-```bash
+# Update central repo
 cd cursor-rules-central
 git pull
+
+# Apply updates to project
+cd your-project
+& "path\to\setup-project.ps1"  # Re-run to update
 ```
-
-Restart Cursor to apply updates.
-
-### Proposing Changes
-
-1. Fork this repository
-2. Create a branch: `git checkout -b improve-typescript-rules`
-3. Edit `.cursor/rules/*.mdc` files
-4. Submit Pull Request
-5. Team reviews and merges
 
 ---
 
-## 📊 Rule File Format
+## Requirements
 
-Rules use `.mdc` (Markdown Cursor) format with YAML frontmatter:
+- Windows 10/11 with PowerShell
+- Git installed
+- Cursor IDE
+- GitHub account (for team sharing)
+
+---
+
+## Architecture
+
+### Rule Format
+
+Uses official Cursor `.mdc` format with YAML frontmatter:
 
 ```markdown
 ---
-description: Brief description of what this rule does
+description: TypeScript coding standards
 globs:
   - "**/*.ts"
   - "**/*.tsx"
 alwaysApply: false
 ---
 
-# Rule Content
+# TypeScript Rules
 
-Your rules in Markdown format with examples...
+Your rules in Markdown...
 ```
 
-### Frontmatter Fields
+### Directory Structure
 
-- **description**: Short description (shown in Cursor UI)
-- **globs**: File patterns to match (optional)
-- **alwaysApply**: `true` = always active, `false` = AI decides (default: false)
+```
+cursor-rules-central/
+├── .cursor/rules/       ← The rules (copied to projects)
+├── scripts/             ← Automation scripts
+├── docs/                ← Documentation
+└── README.md            ← This file
+```
 
 ---
 
-## 🆘 Troubleshooting
+## Safety First
 
-### Rules Not Loading?
+**Critical**: Rules may contain company-specific information and must NEVER be committed to customer repositories.
 
-1. **Check file location**: Must be in `.cursor/rules/`
-2. **Check file extension**: Must be `.mdc`
-3. **Check frontmatter**: Must have valid YAML between `---`
-4. **Restart Cursor**: Close and reopen completely
+**Protection**:
 
-### Rules Not Applying?
+- ✅ Automatic `.gitignore` updates
+- ✅ Pre-commit hooks block commits
+- ✅ Verification script tests safety
+- ✅ Clear documentation and training
 
-1. **Check globs pattern**: Make sure it matches your files
-2. **Check alwaysApply**: Set to `true` if rule should always apply
-3. **Ask Cursor**: "What rules are you following?" in chat
-
-### Safety Verification Failing?
+**Test Safety**:
 
 ```powershell
-# Run verification script
-.\scripts\verify-safety.ps1
-
-# Fix issues by running setup again
-.\scripts\setup-project.ps1
+& "cursor-rules-central\scripts\verify-safety.ps1"
 ```
 
 ---
 
-## 📚 Documentation
+## Team Usage
 
-- **[Getting Started Guide](./docs/GETTING-STARTED.md)** - Detailed setup instructions
-- **[Rule Writing Guide](./docs/WRITING-RULES.md)** - How to create effective rules
-- **[Troubleshooting](./docs/TROUBLESHOOTING.md)** - Common issues and solutions
+### New Developer Onboarding (10 minutes)
 
----
+1. Clone `cursor-rules-central`
+2. For each project: Run `setup-project.ps1`
+3. Done!
 
-## 🤝 Contributing
+### Updating Rules
 
-1. Read existing rules to understand the style
-2. Keep rules focused and actionable
-3. Include examples for complex rules
-4. Test rules before submitting PR
-5. Update CHANGELOG.md
+1. Edit `.mdc` files in central repo
+2. Commit and push
+3. Team runs `git pull` + re-run `setup-project.ps1`
 
 ---
 
-## 📜 License
+## Contributing
 
-Internal use only. © 2026 Your Company Name.
-
----
-
-## 🎯 Quick Reference
-
-| Action             | Command                                                          |
-| ------------------ | ---------------------------------------------------------------- |
-| Clone repo         | `git clone https://github.com/your-org/cursor-rules-central.git` |
-| Open in Cursor     | `cursor .`                                                       |
-| Setup project      | `.\scripts\setup-project.ps1`                                    |
-| Verify safety      | `.\scripts\verify-safety.ps1`                                    |
-| Update rules       | `git pull`                                                       |
-| Check active rules | Cursor: Ctrl+Shift+P → "Show Active Rules"                       |
+1. Create branch: `git checkout -b improve-rules`
+2. Edit `.cursor/rules/*.mdc` files
+3. Test with a project
+4. Create Pull Request
+5. Team reviews and merges
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-01-28  
-**Format**: Cursor .mdc (official format)
+## Troubleshooting
+
+**Rules not loading?**
+
+- Check `.cursor/rules/` exists in project
+- Restart Cursor completely
+- Run `verify-safety.ps1`
+
+**Script won't run?**
+
+```powershell
+& "path\to\setup-project.ps1"  # Use & before path
+```
+
+**See [Complete Setup Guide](./docs/COMPLETE-SETUP-GUIDE.md) for more help.**
+
+---
+
+## License
+
+Internal use only. © 2026
+
+---
+
+## Version History
+
+- **1.0.0** (2026-01-28) - Initial release
+  - Global, TypeScript, React, Python rules
+  - Automated setup scripts
+  - Safety verification
+  - Complete documentation
+
+---
+
+## Support
+
+- 📖 [Complete Documentation](./docs/COMPLETE-SETUP-GUIDE.md)
+- 🚀 [Getting Started](./docs/GETTING-STARTED.md)
+- 🔧 [Troubleshooting](./docs/COMPLETE-SETUP-GUIDE.md#troubleshooting)
+
+---
+
+**Status**: ✅ Production Ready  
+**Last Updated**: January 28, 2026  
+**Tested**: Windows 11, Cursor IDE
