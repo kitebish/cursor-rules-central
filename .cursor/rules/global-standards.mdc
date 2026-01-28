@@ -1,0 +1,134 @@
+---
+description: Global coding standards and best practices for all projects
+alwaysApply: true
+---
+
+# Global Base Rules
+
+These rules apply to ALL projects, regardless of language or framework.
+
+## General Coding Standards
+
+### Naming Conventions
+- Use descriptive, meaningful names for variables, functions, and classes
+- Avoid single-letter names except for loop counters (i, j, k)
+- Use camelCase for variables and functions
+- Use PascalCase for classes and components
+- Use UPPER_SNAKE_CASE for constants
+
+### Code Organization
+- Keep functions small and focused (single responsibility)
+- Maximum function length: 50 lines (prefer 20-30)
+- Group related code together
+- Use clear section comments for major blocks
+
+### Comments
+- Write comments for complex logic or non-obvious decisions
+- Explain WHY, not WHAT (code should be self-explanatory)
+- Keep comments up-to-date with code changes
+- Use TODO comments for future improvements
+
+### Error Handling
+- Always handle errors gracefully
+- Provide meaningful error messages
+- Log errors with sufficient context
+- Never swallow errors silently
+
+## Security Best Practices
+
+### Never Hardcode Secrets
+- No API keys, passwords, or tokens in code
+- Use environment variables for sensitive data
+- Add .env files to .gitignore
+
+### Input Validation
+- Validate all user input
+- Sanitize data before processing
+- Use parameterized queries for databases
+
+### Authentication & Authorization
+- Always verify user permissions
+- Use secure session management
+- Implement proper logout functionality
+
+## Code Quality
+
+### Readability
+- Write code for humans first, computers second
+- Prefer clarity over cleverness
+- Use consistent formatting
+
+### Maintainability
+- Avoid code duplication (DRY principle)
+- Make code easy to test
+- Document complex algorithms
+
+### Performance
+- Optimize only when necessary (measure first)
+- Avoid premature optimization
+- Profile before optimizing
+
+## Git Commit Messages
+
+### Format
+```
+<type>: <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+- feat: New feature
+- fix: Bug fix
+- docs: Documentation changes
+- style: Formatting changes
+- refactor: Code restructuring
+- test: Adding tests
+- chore: Maintenance tasks
+
+### Examples
+```
+feat: Add user authentication
+
+Implemented JWT-based authentication with refresh tokens.
+Added login, logout, and token refresh endpoints.
+
+Closes #123
+```
+
+## Testing
+
+### Write Tests
+- Write tests for new features
+- Maintain existing tests
+- Aim for meaningful coverage (not just high %)
+
+### Test Naming
+- Use descriptive test names
+- Follow pattern: "should [expected behavior] when [condition]"
+
+## Documentation
+
+### Code Documentation
+- Document public APIs
+- Include usage examples
+- Keep documentation in sync with code
+
+### README Files
+- Every project should have a README
+- Include: purpose, setup, usage, contributing
+
+## AI Assistance Guidelines
+
+### When Generating Code
+- Follow all rules above
+- Ask clarifying questions if requirements unclear
+- Suggest best practices and alternatives
+- Explain complex code with comments
+
+### Code Reviews
+- Point out potential issues
+- Suggest improvements
+- Explain reasoning for suggestions

@@ -1,0 +1,255 @@
+---
+description: TypeScript coding standards and best practices
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+alwaysApply: false
+---
+
+# TypeScript Rules
+
+Applied automatically when editing TypeScript files (.ts, .tsx).
+
+## Type System
+
+### Always Use Types
+- Add type annotations to function parameters
+- Add return type annotations to functions
+- Avoid `any` type (use `unknown` if truly unknown)
+- Use `strict` mode in tsconfig.json
+
+### Interfaces vs Types
+- Prefer `interface` for object shapes
+- Use `type` for unions, intersections, and primitives
+- Use `interface` for extending/implementing
+
+**Examples**:
+```typescript
+// ✓ Good: Interface for objects
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+// ✓ Good: Type for unions
+type Status = 'pending' | 'active' | 'inactive';
+
+// ✓ Good: Type for complex types
+type ApiResponse<T> = {
+  data: T;
+  error?: string;
+};
+```
+
+## Modern TypeScript Features
+
+### Use const and let
+- Never use `var`
+- Use `const` by default
+- Use `let` only when reassignment needed
+
+### Async/Await
+- Prefer `async/await` over `.then()`
+- Always handle errors with try/catch
+- Return promises explicitly when needed
+
+**Examples**:
+```typescript
+// ✓ Good
+async function fetchUser(id: string): Promise<User> {
+  try {
+    const response = await fetch(`/api/users/${id}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw error;
+  }
+}
+```
+
+## Functions
+
+### Function Signatures
+- Always specify parameter types
+- Always specify return types
+- Use optional parameters with `?`
+- Use default parameters when appropriate
+
+**Examples**:
+```typescript
+// ✓ Good
+function greet(name: string, greeting: string = 'Hello'): string {
+  return `${greeting}, ${name}!`;
+}
+
+function findUser(id: string): User | null {
+  // implementation
+}
+```
+
+### Arrow Functions
+- Use arrow functions for callbacks
+- Use regular functions for methods
+- Be consistent within a file
+
+## Null Safety
+
+### Strict Null Checks
+- Enable `strictNullChecks` in tsconfig
+- Use `| null` or `| undefined` explicitly
+- Check for null/undefined before using
+
+**Examples**:
+```typescript
+// ✓ Good
+function getUser(id: string): User | null {
+  const user = database.find(id);
+  return user ?? null;
+}
+
+function processUser(user: User | null): void {
+  if (user === null) {
+    console.log('No user found');
+    return;
+  }
+  console.log(user.name); // Safe to access
+}
+```
+
+## Generics
+
+### Use Generics for Reusability
+- Use generics for type-safe reusable code
+- Name generic types descriptively (T, K, V are ok for simple cases)
+- Constrain generics when needed
+
+**Examples**:
+```typescript
+// ✓ Good
+function firstElement<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+interface Repository<T> {
+  find(id: string): Promise<T | null>;
+  save(entity: T): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+// With constraints
+function merge<T extends object>(obj1: T, obj2: Partial<T>): T {
+  return { ...obj1, ...obj2 };
+}
+```
+
+## Enums and Unions
+
+### Prefer Union Types
+- Use string literal unions over enums when possible
+- Use const enums if you must use enums
+- Document enum values
+
+**Examples**:
+```typescript
+// ✓ Good: Union type
+type UserRole = 'admin' | 'user' | 'guest';
+
+// ✓ Acceptable: Const enum
+const enum HttpStatus {
+  OK = 200,
+  NotFound = 404,
+  ServerError = 500,
+}
+```
+
+## Utility Types
+
+### Use Built-in Utility Types
+- `Partial<T>`: Make all properties optional
+- `Required<T>`: Make all properties required
+- `Pick<T, K>`: Select specific properties
+- `Omit<T, K>`: Exclude specific properties
+- `Record<K, T>`: Object with specific key/value types
+
+**Examples**:
+```typescript
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  age: number;
+}
+
+// ✓ Good
+type UserUpdate = Partial<User>;
+type UserPublic = Omit<User, 'email'>;
+type UserNameAndEmail = Pick<User, 'name' | 'email'>;
+```
+
+## Modules and Imports
+
+### Import Organization
+- Group imports: external libraries, internal modules, types
+- Use named imports when possible
+- Avoid default exports (prefer named exports)
+
+**Examples**:
+```typescript
+// ✓ Good
+// External libraries
+import React from 'react';
+import { useState, useEffect } from 'react';
+
+// Internal modules
+import { apiClient } from '@/lib/api';
+import { formatDate } from '@/utils/date';
+
+// Types
+import type { User, Post } from '@/types';
+```
+
+## Documentation
+
+### JSDoc Comments
+- Add JSDoc for public functions and classes
+- Include parameter descriptions
+- Include return value description
+- Include examples for complex functions
+
+**Examples**:
+```typescript
+/**
+ * Fetches a user by ID from the API
+ * @param id - The unique user identifier
+ * @returns Promise resolving to User object or null if not found
+ * @throws {ApiError} When the API request fails
+ * @example
+ * const user = await fetchUser('123');
+ * if (user) {
+ *   console.log(user.name);
+ * }
+ */
+async function fetchUser(id: string): Promise<User | null> {
+  // implementation
+}
+```
+
+## Configuration
+
+### tsconfig.json Settings
+Ensure these are enabled:
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
+```

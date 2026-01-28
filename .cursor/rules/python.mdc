@@ -1,0 +1,302 @@
+---
+description: Python coding standards following PEP 8 and modern best practices
+globs:
+  - "**/*.py"
+alwaysApply: false
+---
+
+# Python Rules
+
+Applied automatically when editing Python files (.py).
+
+## Code Style (PEP 8)
+
+### Naming Conventions
+- `snake_case` for functions and variables
+- `PascalCase` for classes
+- `UPPER_SNAKE_CASE` for constants
+- Prefix private members with underscore: `_private_method`
+
+**Examples**:
+```python
+# ✓ Good
+def calculate_total_price(items: list[Item]) -> float:
+    """Calculate total price of items."""
+    return sum(item.price for item in items)
+
+class UserRepository:
+    """Repository for user data access."""
+    pass
+
+MAX_RETRY_ATTEMPTS = 3
+```
+
+## Type Hints
+
+### Always Use Type Hints
+- Add type hints to function parameters
+- Add return type hints
+- Use `typing` module for complex types
+
+**Examples**:
+```python
+from typing import Optional, List, Dict, Union
+
+# ✓ Good
+def get_user(user_id: str) -> Optional[User]:
+    """Fetch user by ID."""
+    return database.find_user(user_id)
+
+def process_items(items: List[Item]) -> Dict[str, int]:
+    """Process items and return summary."""
+    return {"total": len(items), "processed": len(items)}
+```
+
+## Docstrings
+
+### Write Docstrings for All Public Functions
+- Use triple quotes
+- Include description, parameters, returns, raises
+- Follow Google or NumPy style
+
+**Examples**:
+```python
+def fetch_user_data(user_id: str, include_posts: bool = False) -> Dict[str, any]:
+    """
+    Fetch user data from the database.
+    
+    Args:
+        user_id: The unique identifier for the user
+        include_posts: Whether to include user's posts in the response
+        
+    Returns:
+        Dictionary containing user data
+        
+    Raises:
+        UserNotFoundError: If user with given ID doesn't exist
+        DatabaseError: If database connection fails
+        
+    Example:
+        >>> user_data = fetch_user_data("123", include_posts=True)
+        >>> print(user_data['name'])
+        'John Doe'
+    """
+    # implementation
+```
+
+## Error Handling
+
+### Use Specific Exceptions
+- Catch specific exceptions, not bare `except`
+- Create custom exceptions when needed
+- Always provide error context
+
+**Examples**:
+```python
+# ✓ Good
+try:
+    user = fetch_user(user_id)
+except UserNotFoundError as e:
+    logger.error(f"User {user_id} not found: {e}")
+    raise
+except DatabaseError as e:
+    logger.error(f"Database error: {e}")
+    return None
+```
+
+### Custom Exceptions
+```python
+class UserNotFoundError(Exception):
+    """Raised when user is not found in database."""
+    
+    def __init__(self, user_id: str):
+        self.user_id = user_id
+        super().__init__(f"User with ID {user_id} not found")
+```
+
+## List Comprehensions
+
+### Use List Comprehensions for Simple Cases
+- Prefer comprehensions over map/filter for readability
+- Keep comprehensions simple (max 2 clauses)
+- Use regular loops for complex logic
+
+**Examples**:
+```python
+# ✓ Good
+active_users = [user for user in users if user.is_active]
+user_names = [user.name for user in users]
+squared = [x**2 for x in range(10)]
+
+# ✓ Good: Dictionary comprehension
+user_dict = {user.id: user.name for user in users}
+```
+
+## Context Managers
+
+### Use Context Managers for Resources
+- Always use `with` for files, connections, locks
+- Create custom context managers when needed
+
+**Examples**:
+```python
+# ✓ Good
+with open('file.txt', 'r') as f:
+    content = f.read()
+
+with database.connection() as conn:
+    result = conn.execute(query)
+```
+
+### Custom Context Manager
+```python
+from contextlib import contextmanager
+
+@contextmanager
+def timer(name: str):
+    """Context manager to time code execution."""
+    start = time.time()
+    try:
+        yield
+    finally:
+        duration = time.time() - start
+        print(f"{name} took {duration:.2f} seconds")
+
+# Usage
+with timer("Database query"):
+    results = database.query(sql)
+```
+
+## Pathlib
+
+### Use pathlib Instead of os.path
+- More readable and object-oriented
+- Cross-platform compatibility
+- Chainable operations
+
+**Examples**:
+```python
+from pathlib import Path
+
+# ✓ Good
+config_path = Path.home() / '.config' / 'app' / 'settings.json'
+if config_path.exists():
+    content = config_path.read_text()
+```
+
+## Dataclasses
+
+### Use Dataclasses for Data Structures
+- Cleaner than regular classes for data
+- Automatic `__init__`, `__repr__`, `__eq__`
+- Type hints built-in
+
+**Examples**:
+```python
+from dataclasses import dataclass, field
+from typing import List
+
+# ✓ Good
+@dataclass
+class User:
+    id: str
+    name: str
+    email: str
+    age: int
+    tags: List[str] = field(default_factory=list)
+    
+    def is_adult(self) -> bool:
+        return self.age >= 18
+
+# Usage
+user = User(id="123", name="John", email="john@example.com", age=25)
+print(user)  # User(id='123', name='John', ...)
+```
+
+## Async/Await
+
+### Use Async for I/O Operations
+- Use `async`/`await` for network, file I/O
+- Use `asyncio.gather` for concurrent operations
+- Don't mix sync and async code
+
+**Examples**:
+```python
+import asyncio
+from typing import List
+
+# ✓ Good
+async def fetch_user(user_id: str) -> User:
+    """Fetch user asynchronously."""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'/api/users/{user_id}') as response:
+            data = await response.json()
+            return User(**data)
+
+async def fetch_multiple_users(user_ids: List[str]) -> List[User]:
+    """Fetch multiple users concurrently."""
+    tasks = [fetch_user(user_id) for user_id in user_ids]
+    return await asyncio.gather(*tasks)
+```
+
+## Testing
+
+### Write Tests with pytest
+- Use descriptive test names
+- Use fixtures for setup
+- Test edge cases
+
+**Examples**:
+```python
+import pytest
+
+def test_calculate_total_price_with_items():
+    """Test total price calculation with valid items."""
+    items = [
+        Item(name="Apple", price=1.50),
+        Item(name="Banana", price=0.75),
+    ]
+    total = calculate_total_price(items)
+    assert total == 2.25
+
+def test_calculate_total_price_with_empty_list():
+    """Test total price with no items."""
+    assert calculate_total_price([]) == 0.0
+
+@pytest.fixture
+def sample_user():
+    """Fixture providing a sample user."""
+    return User(id="123", name="John", email="john@example.com")
+
+def test_user_is_adult(sample_user):
+    """Test adult verification."""
+    sample_user.age = 25
+    assert sample_user.is_adult() is True
+```
+
+## Logging
+
+### Use logging Module
+- Don't use print() for logging
+- Use appropriate log levels
+- Include context in log messages
+
+**Examples**:
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ✓ Good
+def process_user(user_id: str) -> None:
+    logger.info(f"Processing user {user_id}")
+    try:
+        user = fetch_user(user_id)
+        logger.debug(f"Fetched user: {user.name}")
+    except UserNotFoundError:
+        logger.error(f"User {user_id} not found")
+        raise
+    except Exception as e:
+        logger.exception(f"Unexpected error processing user {user_id}")
+        raise
+```

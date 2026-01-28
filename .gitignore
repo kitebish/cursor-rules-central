@@ -1,6 +1,13 @@
-# Cursor Rules - DO NOT COMMIT
-.cursor/
-*.mdc
+# IMPORTANT: We WANT to commit .cursor/rules/ (that's our central rules!)
+# But we DON'T want to commit .cursor/ in project directories
+
+# Allow .cursor/rules/ but block everything else in .cursor/
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+
+# Block .mdc files OUTSIDE of .cursor/rules/
+/*.mdc
 
 # Environment variables
 .env
@@ -11,6 +18,7 @@
 node_modules/
 venv/
 env/
+ENV/
 
 # IDE
 .vscode/
