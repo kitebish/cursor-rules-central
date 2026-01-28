@@ -1,0 +1,272 @@
+---
+description: Project-specific rules template (GITIGNORED - customize per project)
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+# Project-Specific Rules Template
+
+**IMPORTANT**: This file is gitignored and should be customized for each project.
+
+---
+
+## Project Context
+
+### Project Name
+[e.g., Customer Portal v2]
+
+### Customer/Client
+[e.g., Acme Corporation]
+
+### Tech Stack
+- Frontend: [e.g., React 18, TypeScript]
+- Backend: [e.g., Node.js, Express, PostgreSQL]
+- Deployment: [e.g., AWS, Docker]
+
+### Project Type
+[e.g., E-commerce platform, Internal dashboard, Mobile app backend]
+
+---
+
+## Customer-Specific Requirements
+
+### Naming Conventions
+[Any customer-specific naming that differs from company standards]
+
+Example:
+- Use "Client" instead of "Customer" in all user-facing text
+- API endpoints must use kebab-case (customer requirement)
+- Database tables must have "tbl_" prefix
+
+### Business Rules
+[Customer-specific business logic that AI should know]
+
+Example:
+- Orders over $1000 require manager approval
+- Users in "Premium" tier get free shipping
+- Refunds only allowed within 30 days
+
+### Compliance Requirements
+[Any regulatory or compliance needs]
+
+Example:
+- GDPR compliance required
+- PCI-DSS for payment processing
+- HIPAA for health data
+
+---
+
+## Architecture Decisions
+
+### State Management
+[How state is managed in this project]
+
+Example:
+- Use Redux for global state
+- Use React Query for server state
+- Local state with useState for UI-only state
+
+### API Design
+[API patterns used in this project]
+
+Example:
+- RESTful API with versioning (/api/v1/)
+- Use JWT for authentication
+- Pagination: limit/offset pattern
+
+### Database Schema
+[Key database design decisions]
+
+Example:
+- Soft deletes (deleted_at column)
+- UUID primary keys
+- Audit columns: created_at, updated_at, created_by, updated_by
+
+---
+
+## Third-Party Integrations
+
+### Payment Gateway
+[e.g., Stripe, PayPal]
+- API Key location: [e.g., process.env.STRIPE_SECRET_KEY]
+- Webhook endpoint: [e.g., /api/webhooks/stripe]
+
+### Email Service
+[e.g., SendGrid, AWS SES]
+- Templates location: [e.g., /templates/emails/]
+- From address: [e.g., noreply@customer.com]
+
+### External APIs
+[List any external APIs used]
+- Weather API: [endpoint, auth method]
+- Maps API: [endpoint, auth method]
+
+---
+
+## File Organization
+
+### Custom Folder Structure
+[Any project-specific folder organization]
+
+Example:
+```
+src/
+├── features/          # Feature-based organization
+│   ├── auth/
+│   ├── products/
+│   └── orders/
+├── shared/            # Shared components
+└── legacy/            # Legacy code (to be refactored)
+```
+
+### Import Aliases
+[Path aliases configured in this project]
+
+Example:
+```typescript
+import { Button } from '@/components/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { API_URL } from '@/config';
+```
+
+---
+
+## Testing Strategy
+
+### Test Coverage Requirements
+[Project-specific test requirements]
+
+Example:
+- Minimum 80% coverage for business logic
+- E2E tests for critical user flows
+- Visual regression tests for UI components
+
+### Test Data
+[How to handle test data]
+
+Example:
+- Use factories for test data generation
+- Seed database with: `npm run db:seed:test`
+- Mock external APIs in tests
+
+---
+
+## Deployment
+
+### Environments
+1. **Development**: [URL, purpose]
+2. **Staging**: [URL, purpose]
+3. **Production**: [URL, purpose]
+
+### Environment Variables
+[Project-specific env vars]
+
+Example:
+```
+REACT_APP_API_URL=https://api.customer.com
+REACT_APP_ANALYTICS_ID=UA-XXXXX-Y
+CUSTOMER_FEATURE_FLAG=true
+```
+
+### Deployment Process
+[How to deploy this project]
+
+Example:
+1. Create PR to `develop` branch
+2. Automated tests run
+3. Manual QA on staging
+4. Merge to `main` triggers production deployment
+
+---
+
+## Known Issues / Workarounds
+
+### Browser Compatibility
+[Any known browser issues]
+
+Example:
+- IE11 not supported (customer approved)
+- Safari date picker requires polyfill
+
+### Performance Considerations
+[Performance-related notes]
+
+Example:
+- Product images must be optimized (use WebP)
+- Lazy load product list (customer has 10,000+ products)
+- Cache API responses for 5 minutes
+
+### Technical Debt
+[Known technical debt to be aware of]
+
+Example:
+- Legacy authentication system (migration planned Q2)
+- Old API endpoints (v1) still in use, deprecate by June
+- Database needs indexing on orders table
+
+---
+
+## Team Contacts
+
+### Key People
+- **Product Owner**: [Name, contact]
+- **Tech Lead**: [Name, contact]
+- **DevOps**: [Name, contact]
+
+### Communication
+- **Slack Channel**: [e.g., #project-customer-portal]
+- **Stand-ups**: [e.g., Daily at 9:30 AM]
+- **Sprint Planning**: [e.g., Every other Monday]
+
+---
+
+## Useful Commands
+
+### Development
+```bash
+npm run dev              # Start dev server
+npm run test             # Run tests
+npm run lint             # Lint code
+```
+
+### Database
+```bash
+npm run db:migrate       # Run migrations
+npm run db:seed          # Seed database
+npm run db:reset         # Reset database
+```
+
+### Deployment
+```bash
+npm run build            # Build for production
+npm run deploy:staging   # Deploy to staging
+npm run deploy:prod      # Deploy to production
+```
+
+---
+
+## Additional Notes
+
+[Any other project-specific information that would help AI generate better code]
+
+Example:
+- Customer prefers verbose error messages
+- All dates should be in MM/DD/YYYY format (US customer)
+- Currency always in USD with $ symbol
+- Use customer's brand colors: #FF6B6B (primary), #4ECDC4 (secondary)
+
+---
+
+**Last Updated**: [Date]  
+**Updated By**: [Your name]
+
+---
+
+## How to Use This Template
+
+1. Copy this file to your project root as `.cursorrules` or `.cursor/project-rules.mdc`
+2. Fill in all sections relevant to your project
+3. Keep it updated as project evolves
+4. This file is gitignored - never commit to customer repos
+5. Share with team members manually if needed

@@ -25,29 +25,8 @@ $centralRepoPath = Split-Path -Parent $scriptPath
 Write-Host "Central rules location: $centralRepoPath" -ForegroundColor Gray
 Write-Host ""
 
-# Step 1: Copy .cursor/rules/ from central repo
-Write-Host "[1/4] Copying .cursor/rules/ from central repository..." -ForegroundColor Yellow
-
-if (Test-Path "$centralRepoPath\.cursor\rules") {
-    # Create .cursor directory if it doesn't exist
-    if (!(Test-Path ".cursor")) {
-        New-Item -ItemType Directory -Path ".cursor" | Out-Null
-    }
-    
-    # Copy rules directory
-    Copy-Item -Recurse -Force "$centralRepoPath\.cursor\rules" ".cursor\"
-    
-    $ruleCount = (Get-ChildItem ".cursor\rules\*.mdc").Count
-    Write-Host "SUCCESS: Copied $ruleCount rule files to .cursor/rules/" -ForegroundColor Green
-} else {
-    Write-Host "ERROR: Cannot find .cursor/rules/ in central repository" -ForegroundColor Red
-    Write-Host "Expected location: $centralRepoPath\.cursor\rules" -ForegroundColor Red
-    exit 1
-}
-Write-Host ""
-
-# Step 2: Check if it's a Git repository
-Write-Host "[2/4] Checking Git repository..." -ForegroundColor Yellow
+# Step 1: Check if it's a Git repository (FIRST!)
+Write-Host "[1/4] Checking Git repository..." -ForegroundColor Yellow
 if (!(Test-Path ".git")) {
     Write-Host "WARNING: This is not a Git repository" -ForegroundColor Red
     Write-Host "Initialize Git first with: git init" -ForegroundColor Yellow
@@ -56,8 +35,8 @@ if (!(Test-Path ".git")) {
 Write-Host "SUCCESS: Git repository detected" -ForegroundColor Green
 Write-Host ""
 
-# Step 3: Update .gitignore
-Write-Host "[3/4] Updating .gitignore..." -ForegroundColor Yellow
+# Step 2: Create/Update .gitignore BEFORE copying rules (CRITICAL!)
+Write-Host "[2/4] Creating/updating .gitignore..." -ForegroundColor Yellow
 
 $gitignorePath = ".gitignore"
 $cursorIgnoreLines = @"
@@ -79,6 +58,28 @@ if (Test-Path $gitignorePath) {
 } else {
     Set-Content -Path $gitignorePath -Value $cursorIgnoreLines.TrimStart()
     Write-Host "SUCCESS: Created .gitignore with Cursor rules" -ForegroundColor Green
+}
+Write-Host ""
+
+# Step 3: NOW copy .cursor/rules/ (AFTER gitignore is in place)
+Write-Host "[3/4] Copying .cursor/rules/ from central repository..." -ForegroundColor Yellow
+
+if (Test-Path "$centralRepoPath\.cursor\rules") {
+    # Create .cursor directory if it doesn't exist
+    if (!(Test-Path ".cursor")) {
+        New-Item -ItemType Directory -Path ".cursor" | Out-Null
+    }
+    
+    # Copy rules directory
+    Copy-Item -Recurse -Force "$centralRepoPath\.cursor\rules" ".cursor\"
+    
+    $ruleCount = (Get-ChildItem ".cursor\rules\*.mdc").Count
+    Write-Host "SUCCESS: Copied $ruleCount rule files to .cursor/rules/" -ForegroundColor Green
+    Write-Host "NOTE: These files are gitignored and will NOT be committed" -ForegroundColor Cyan
+} else {
+    Write-Host "ERROR: Cannot find .cursor/rules/ in central repository" -ForegroundColor Red
+    Write-Host "Expected location: $centralRepoPath\.cursor\rules" -ForegroundColor Red
+    exit 1
 }
 Write-Host ""
 
@@ -113,20 +114,6 @@ exit 0
 if (!(Test-Path ".git\hooks")) {
     New-Item -ItemType Directory -Path ".git\hooks" | Out-Null
 }
-
-Set-Content -Path $hookPath -Value $hookContent -NoNewline
-Write-Host "SUCCESS: Installed pre-commit hook" -ForegroundColor Green
-Write-Host ""
-
-# Summary
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Setup Complete!" -ForegroundColor Green
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "What was configured:" -ForegroundColor White
-Write-Host "- Copied .cursor/rules/ to this project" -ForegroundColor Green
-Write-Host "- .gitignore updated to block Cursor files" -ForegroundColor Green
-Write-Host "- Pre-commit hook installed" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor White
 Write-Host "1. Open this project in Cursor" -ForegroundColor Gray

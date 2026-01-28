@@ -1,0 +1,346 @@
+---
+description: Node.js and Express framework standards
+globs:
+  - "**/server.js"
+  - "**/app.js"
+  - "**/routes/**/*.js"
+  - "**/controllers/**/*.js"
+  - "**/middleware/**/*.js"
+alwaysApply: false
+---
+
+# Node.js & Express Framework Rules
+
+## Project Structure
+
+### Standard Directory Layout
+```
+project/
+├── src/
+│   ├── routes/          # Route definitions
+│   ├── controllers/     # Business logic
+│   ├── middleware/      # Custom middleware
+│   ├── models/          # Data models
+│   ├── services/        # External services
+│   └── utils/           # Helper functions
+├── tests/
+└── server.js            # Entry point
+```
+
+## Express Best Practices
+
+### Route Organization
+- Group related routes in separate files
+- Use Express Router for modular routes
+- Keep routes thin, delegate to controllers
+- Use meaningful route names
+
+Example:
+```javascript
+// routes/users.js
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/userController');
+
+router.get('/', userController.getAllUsers);
+router.post('/', userController.createUser);
+
+module.exports = router;
+```
+
+### Controller Pattern
+- One controller per resource
+- Controllers handle request/response
+- Delegate business logic to services
+- Always use async/await
+
+Example:
+```javascript
+// controllers/userController.js
+const userService = require('../services/userService');
+
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const users = await userService.getUsers();
+    res.json({ success: true, data: users });
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+## Middleware
+
+### Custom Middleware
+- Place in `middleware/` directory
+- Use descriptive names
+- Always call `next()` or send response
+- Handle errors properly
+
+Example:
+```javascript
+// middleware/auth.js
+const jwt = require('jsonwebtoken');
+
+module.exports = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
+```
+
+### Middleware Order
+1. Body parsers
+2. CORS
+3. Logging
+4. Authentication
+5. Routes
+6. Error handlers (last)
+
+## Error Handling
+
+### Centralized Error Handler
+```javascript
+// middleware/errorHandler.js
+module.exports = (err, req, res, next) => {
+  console.error(err.stack);
+  
+  res.status(err.status || 500).json({
+    success: false,
+    error: {
+      message: err.message,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    }
+  });
+};
+```
+
+### Use in Routes
+```javascript
+router.get('/users/:id', async (req, res, next) => {
+  try {
+    const user = await userService.getUserById(req.params.id);
+    if (!user) {
+      const error = new Error('User not found');
+      error.status = 404;
+      throw error;
+    }
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+## Environment Variables
+
+### Configuration
+- Use `dotenv` for environment variables
+- Never commit `.env` file
+- Provide `.env.example` template
+- Validate required env vars on startup
+
+Example:
+```javascript
+// config/env.js
+require('dotenv').config();
+
+const requiredEnvVars = ['PORT', 'DATABASE_URL', 'JWT_SECRET'];
+
+requiredEnvVars.forEach(varName => {
+  if (!process.env[varName]) {
+    throw new Error(`Missing required environment variable: ${varName}`);
+  }
+});
+
+module.exports = {
+  port: process.env.PORT,
+  databaseUrl: process.env.DATABASE_URL,
+  jwtSecret: process.env.JWT_SECRET
+};
+```
+
+## Security
+
+### Essential Security Middleware
+```javascript
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
+
+// Helmet for security headers
+app.use(helmet());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use('/api/', limiter);
+
+// Sanitize user input
+app.use(mongoSanitize());
+```
+
+### Input Validation
+- Always validate user input
+- Use libraries like `joi` or `express-validator`
+- Validate at route level
+
+Example:
+```javascript
+const { body, validationResult } = require('express-validator');
+
+router.post('/users',
+  [
+    body('email').isEmail(),
+    body('password').isLength({ min: 8 })
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    // Process request
+  }
+);
+```
+
+## Database
+
+### Connection Management
+```javascript
+// db/connection.js
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.DATABASE_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('Database connected');
+  } catch (error) {
+    console.error('Database connection error:', error);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+```
+
+### Model Definitions
+- One model per file
+- Use schema validation
+- Add indexes for performance
+- Include timestamps
+
+## API Response Format
+
+### Standard Response Structure
+```javascript
+// Success
+{
+  "success": true,
+  "data": { /* response data */ }
+}
+
+// Error
+{
+  "success": false,
+  "error": {
+    "message": "Error description",
+    "code": "ERROR_CODE"
+  }
+}
+
+// Paginated
+{
+  "success": true,
+  "data": [ /* items */ ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 100
+  }
+}
+```
+
+## Testing
+
+### Test Structure
+```javascript
+// tests/users.test.js
+const request = require('supertest');
+const app = require('../app');
+
+describe('User API', () => {
+  describe('GET /api/users', () => {
+    it('should return all users', async () => {
+      const res = await request(app)
+        .get('/api/users')
+        .expect(200);
+      
+      expect(res.body.success).toBe(true);
+      expect(Array.isArray(res.body.data)).toBe(true);
+    });
+  });
+});
+```
+
+## Logging
+
+### Use Structured Logging
+```javascript
+const winston = require('winston');
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' })
+  ]
+});
+
+// Use in code
+logger.info('User created', { userId: user.id });
+logger.error('Database error', { error: err.message });
+```
+
+## Performance
+
+### Optimization Tips
+- Use compression middleware
+- Enable gzip
+- Implement caching (Redis)
+- Use connection pooling
+- Optimize database queries
+- Implement pagination for large datasets
+
+Example:
+```javascript
+const compression = require('compression');
+app.use(compression());
+```
+
+## Documentation
+
+### API Documentation
+- Use Swagger/OpenAPI
+- Document all endpoints
+- Include request/response examples
+- Keep docs up to date
+
+---
+
+**Remember**: Express is unopinionated - these rules provide structure and best practices for maintainable Node.js applications.
