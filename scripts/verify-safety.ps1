@@ -11,7 +11,7 @@ Write-Host "Location: $(Get-Location)"
 Write-Host ""
 
 # Test 1: Check .gitignore
-Write-Host "[Test 1/3] .gitignore" -ForegroundColor Yellow
+Write-Host "[Test 1/4] .gitignore" -ForegroundColor Yellow
 if (Test-Path ".gitignore") {
     $content = Get-Content ".gitignore" -Raw
     if ($content -match "\.cursor") {
@@ -28,7 +28,7 @@ if (Test-Path ".gitignore") {
 }
 
 # Test 2: Check pre-commit hook
-Write-Host "[Test 2/3] Pre-commit hook" -ForegroundColor Yellow
+Write-Host "[Test 2/4] Pre-commit hook" -ForegroundColor Yellow
 if (Test-Path ".git\hooks\pre-commit") {
     $content = Get-Content ".git\hooks\pre-commit" -Raw
     if ($content -match "cursor") {
@@ -44,8 +44,17 @@ if (Test-Path ".git\hooks\pre-commit") {
     $allTestsPassed = $false
 }
 
-# Test 3: Check no cursor files in Git
-Write-Host "[Test 3/3] No cursor files in Git" -ForegroundColor Yellow
+# Test 3: Check CI/CD workflow
+Write-Host "[Test 3/4] CI/CD workflow" -ForegroundColor Yellow
+if (Test-Path ".github\workflows\safety-check.yml") {
+    Write-Host "  PASS" -ForegroundColor Green
+} else {
+    Write-Host "  WARN" -ForegroundColor Yellow
+    Write-Host "  CI/CD workflow not installed (optional)" -ForegroundColor Gray
+}
+
+# Test 4: Check no cursor files in Git
+Write-Host "[Test 4/4] No cursor files in Git" -ForegroundColor Yellow
 if (Test-Path ".git") {
     $cursorFiles = git ls-files | Select-String -Pattern "\.cursor/|\.mdc$|\.cursorrules$"
     if ($cursorFiles) {

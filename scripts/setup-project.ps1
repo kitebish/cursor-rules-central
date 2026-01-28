@@ -112,9 +112,32 @@ if (!(Test-Path ".git\hooks")) {
 Set-Content -Path $hookPath -Value $hookContent -NoNewline
 Write-Host "  Pre-commit hook installed" -ForegroundColor Green
 
+# Step 5: Copy GitHub Actions workflow (CI/CD layer)
+Write-Host "[Step 5/5] Installing CI/CD safety check" -ForegroundColor Yellow
+
+$workflowSource = "$centralRepoPath\.github\workflows\safety-check.yml"
+$workflowDest = ".github\workflows\safety-check.yml"
+
+if (Test-Path $workflowSource) {
+    if (!(Test-Path ".github\workflows")) {
+        New-Item -ItemType Directory -Path ".github\workflows" -Force | Out-Null
+    }
+    
+    Copy-Item -Path $workflowSource -Destination $workflowDest -Force
+    Write-Host "  GitHub Actions workflow installed" -ForegroundColor Green
+    Write-Host "  Will run on every push and pull request" -ForegroundColor Gray
+} else {
+    Write-Host "  SKIP (workflow not found in central repo)" -ForegroundColor Yellow
+}
+
 # Summary
 Write-Host ""
 Write-Host "Setup complete" -ForegroundColor Green
+Write-Host ""
+Write-Host "Safety layers installed:"
+Write-Host "  1. .gitignore (passive blocking)"
+Write-Host "  2. Pre-commit hook (active blocking)"
+Write-Host "  3. CI/CD check (server-side verification)"
 Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Open project in Cursor"

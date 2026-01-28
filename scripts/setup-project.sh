@@ -106,9 +106,29 @@ echo "$HOOK_CONTENT" > "$HOOK_PATH"
 chmod +x "$HOOK_PATH"
 echo -e "  ${GREEN}Pre-commit hook installed${NC}"
 
+# Step 5: Copy GitHub Actions workflow (CI/CD layer)
+echo -e "${YELLOW}[Step 5/5] Installing CI/CD safety check${NC}"
+
+WORKFLOW_SOURCE="$CENTRAL_REPO_PATH/.github/workflows/safety-check.yml"
+WORKFLOW_DEST=".github/workflows/safety-check.yml"
+
+if [ -f "$WORKFLOW_SOURCE" ]; then
+    mkdir -p .github/workflows
+    cp "$WORKFLOW_SOURCE" "$WORKFLOW_DEST"
+    echo -e "  ${GREEN}GitHub Actions workflow installed${NC}"
+    echo -e "  ${GRAY}Will run on every push and pull request${NC}"
+else
+    echo -e "  ${YELLOW}SKIP (workflow not found in central repo)${NC}"
+fi
+
 # Summary
 echo ""
 echo -e "${GREEN}Setup complete${NC}"
+echo ""
+echo "Safety layers installed:"
+echo "  1. .gitignore (passive blocking)"
+echo "  2. Pre-commit hook (active blocking)"
+echo "  3. CI/CD check (server-side verification)"
 echo ""
 echo "Next steps:"
 echo "  1. Open project in Cursor"

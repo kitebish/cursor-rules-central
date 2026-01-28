@@ -19,7 +19,7 @@ echo "Location: $(pwd)"
 echo ""
 
 # Test 1: Check .gitignore
-echo -n "[Test 1/3] .gitignore... "
+echo -n "[Test 1/4] .gitignore... "
 if [ -f ".gitignore" ] && grep -q ".cursor" ".gitignore"; then
     echo -e "${GREEN}PASS${NC}"
 else
@@ -29,7 +29,7 @@ else
 fi
 
 # Test 2: Check pre-commit hook
-echo -n "[Test 2/3] Pre-commit hook... "
+echo -n "[Test 2/4] Pre-commit hook... "
 if [ -f ".git/hooks/pre-commit" ]; then
     if grep -q "cursor" ".git/hooks/pre-commit"; then
         echo -e "${GREEN}PASS${NC}"
@@ -44,8 +44,17 @@ else
     ALL_TESTS_PASSED=false
 fi
 
-# Test 3: Check no cursor files in Git
-echo -n "[Test 3/3] No cursor files in Git... "
+# Test 3: Check CI/CD workflow
+echo -n "[Test 3/4] CI/CD workflow... "
+if [ -f ".github/workflows/safety-check.yml" ]; then
+    echo -e "${GREEN}PASS${NC}"
+else
+    echo -e "${YELLOW}WARN${NC}"
+    echo -e "  ${YELLOW}CI/CD workflow not installed (optional)${NC}"
+fi
+
+# Test 4: Check no cursor files in Git
+echo -n "[Test 4/4] No cursor files in Git... "
 if git ls-files | grep -qE '\.cursor/|\.mdc$|\.cursorrules$'; then
     echo -e "${RED}FAIL${NC}"
     echo -e "  ${YELLOW}Found cursor files in Git:${NC}"
