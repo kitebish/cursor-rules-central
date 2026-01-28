@@ -182,6 +182,113 @@ cd C:\Projects\customer-a-frontend
 
 The script will copy the updated rules to your project.
 
+### Restart Cursor
+
+```powershell
+# Close and reopen Cursor to reload rules
+cursor .
+```
+
+---
+
+## How Updates Work (Important!)
+
+### Understanding the Copy Mechanism
+
+When you run `setup-project.ps1`, it **COPIES** the rules from the central repository to your project:
+
+```
+Central Repository                Your Project
+┌─────────────────────┐          ┌──────────────────┐
+│ cursor-rules-central│          │ customer-project │
+│  └─ .cursor/rules/  │  COPY    │  └─ .cursor/     │
+│      ├─ global.mdc  │  ────>   │      └─ rules/   │
+│      ├─ typescript  │          │         ├─ global │
+│      └─ react.mdc   │          │         ├─ ts    │
+└─────────────────────┘          │         └─ react │
+                                 └──────────────────┘
+```
+
+**Key Point**: Your project has its **OWN INDEPENDENT COPY** of the rules.
+
+### What This Means
+
+✅ **Projects are independent** - No network dependency, works offline  
+✅ **You control updates** - Choose when to update each project  
+✅ **Stability** - Projects won't break if central rules change  
+✅ **Testing** - Test new rules on one project before updating all
+
+❌ **Not automatic** - Projects don't auto-update when central repo changes  
+❌ **Manual process** - Need to re-run setup script to get updates
+
+### Update Workflow
+
+**When someone updates the central repository**:
+
+```
+1. Developer updates rules in cursor-rules-central
+   └─> git commit -m "Update TypeScript rules"
+   └─> git push
+
+2. Team gets notified (Slack, email, etc.)
+   └─> "Rules updated! Please pull and update your projects"
+
+3. Each team member:
+   ├─> cd cursor-rules-central
+   ├─> git pull                    (get latest rules)
+   │
+   └─> For each active project:
+       ├─> cd C:\Projects\project-name
+       ├─> run setup-project.ps1   (copy new rules)
+       └─> restart Cursor          (reload rules)
+```
+
+### Example: Updating 3 Projects
+
+```powershell
+# Step 1: Update central repo (once)
+cd C:\Users\YourName\cursor-rules-central
+git pull
+
+# Step 2: Update each project
+cd C:\Projects\customer-a-frontend
+& "C:\Users\YourName\cursor-rules-central\scripts\setup-project.ps1"
+
+cd C:\Projects\customer-b-backend
+& "C:\Users\YourName\cursor-rules-central\scripts\setup-project.ps1"
+
+cd C:\Projects\customer-c-mobile
+& "C:\Users\YourName\cursor-rules-central\scripts\setup-project.ps1"
+
+# Step 3: Restart Cursor for each project
+```
+
+**Time**: ~1 minute per project
+
+### Why Not Automatic Updates?
+
+**We use copying instead of symlinks because**:
+
+1. **Reliability** - Symlinks can be fragile on Windows
+2. **Control** - You decide when to update (stability)
+3. **Testing** - Test updates on one project first
+4. **Offline** - Works without network connection
+5. **Simplicity** - No admin rights needed
+
+### Alternative: Symlinks (Advanced, Not Recommended)
+
+If you wanted automatic updates, you could use symlinks:
+
+```powershell
+# Create symlink instead of copying
+New-Item -ItemType SymbolicLink -Path ".cursor" -Target "C:\Users\YourName\cursor-rules-central\.cursor"
+```
+
+**Pros**: Automatic updates  
+**Cons**: Requires admin rights, fragile, all projects update at once
+
+**Recommendation**: Stick with the copy approach for reliability.
+
 ---
 
 ## Common Scenarios
